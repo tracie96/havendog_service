@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import authRoutes from './routes/auth.js';
 import adoptionRoutes from './routes/adoption.js';
+import petInterestRoutes from './routes/petInterest.js';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/adoptions', adoptionRoutes);
+app.use('/api/interests', petInterestRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/havendogs')
