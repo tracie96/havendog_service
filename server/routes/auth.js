@@ -22,6 +22,7 @@ const router = express.Router();
 // Register a new user (pet owner or veterinarian)
 router.post('/register', async (req, res) => {
     try {
+        console.log('here');
         const {
             firstName,
             lastName,
@@ -104,7 +105,6 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            
             return res.status(400).json({ message: 'User not found' });
         }
 
@@ -128,11 +128,18 @@ router.post('/login', async (req, res) => {
                 email: user.email,
                 userType: user.userType
             }
-        });i
+        });
     } catch (error) {
         res.status(500).json({ message: 'Error logging in', error: error.message });
     }
 });
+
+// Pet routes
+router.post('/pets', verifyToken, addPet);
+router.get('/pets', verifyToken, getUserPets);
+router.get('/pets/:id', verifyToken, getAnimalById);
+router.put('/pets/:id', verifyToken, updateAnimalById);
+router.delete('/pets/:id', verifyToken, deleteAnimalById);
 
 // Update boarding/fostering preferences
 router.put('/preferences', async (req, res) => {
@@ -165,36 +172,35 @@ router.put('/preferences', async (req, res) => {
 });
 
 router.post('/authenticate', async (req, res) => {
-  console.log('here');
+    console.log('here');
 
-  const { accessToken } = req.body;
-  try {
-    // Step 3: Validate Access Token with Google's API
-    const userData = await AuthController.validateGoogleAccessToken(accessToken);
+    const { accessToken } = req.body;
+    try {
+        // Step 3: Validate Access Token with Google's API
+        const userData = await AuthController.validateGoogleAccessToken(accessToken);
 
-    // Step 4: Extract User Information
-    const { sub, email, name } = userData;
+        // Step 4: Extract User Information
+        const { sub, email, name } = userData;
 
-    // Step 5: Check if the user exists in your database
-    let user = await AuthController.findUserByEmail(email);
+        // Step 5: Check if the user exists in your database
+        let user = await AuthController.findUserByEmail(email);
 
-    // Step 6: Create/Register User if not exists
-    if (!user) {
-      user = await AuthController.createUser({ googleId: sub, email, name });
+        // Step 6: Create/Register User if not exists
+        if (!user) {
+            user = await AuthController.createUser({ googleId: sub, email, name });
+        }
+
+        // Step 7: Generate Backend Session/Token
+        const sessionToken = AuthController.generateSessionToken();
+
+        // Step 8: Send Session Token back to Frontend
+        res.json({ sessionToken });
+    } catch (error) {
+        console.error('Error during authentication:', error);
+        res.status(401).json({ error: error.message });
     }
-
-    // Step 7: Generate Backend Session/Token
-    const sessionToken = AuthController.generateSessionToken();
-
-    // Step 8: Send Session Token back to Frontend
-    res.json({ sessionToken });
-  } catch (error) {
-    console.error('Error during authentication:', error);
-    res.status(401).json({ error: error.message });
-  }
 });
 
-router.post("/login", login);
 router.post('/professionals', createProfessional);
 
 router.post("/replace", replaceUser);
