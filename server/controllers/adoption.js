@@ -4,7 +4,8 @@ import Adoption from '../models/Adoption.js';
 export const createAdoption = async (req, res) => {
     try {
         const { name, breed, age, location, imageUrl, description } = req.body;
-        const postedBy = req.user.userId;
+        // Use default ID instead of requiring user authentication
+        const postedBy = "67ed8887f483b67ee96b16c2"; // Default user ID
 
         const adoption = new Adoption({
             name,
@@ -61,10 +62,7 @@ export const updateAdoptionStatus = async (req, res) => {
             return res.status(404).json({ message: 'Adoption listing not found' });
         }
 
-        // Check if user is the owner of the listing
-        if (adoption.postedBy.toString() !== req.user.userId) {
-            return res.status(403).json({ message: 'Not authorized to update this listing' });
-        }
+        // Authentication check removed - anyone can update
 
         adoption.status = status;
         await adoption.save();
@@ -84,12 +82,9 @@ export const deleteAdoption = async (req, res) => {
             return res.status(404).json({ message: 'Adoption listing not found' });
         }
 
-        // Check if user is the owner of the listing
-        if (adoption.postedBy.toString() !== req.user.userId) {
-            return res.status(403).json({ message: 'Not authorized to delete this listing' });
-        }
+        // Authentication check removed - anyone can delete
 
-        await adoption.remove();
+        await Adoption.findByIdAndDelete(req.params.id);
         res.json({ message: 'Adoption listing deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting adoption listing', error: error.message });
