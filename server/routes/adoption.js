@@ -1,5 +1,4 @@
 import express from 'express';
-import { verifyToken } from '../middleware/auth.js';
 import {
     createAdoption,
     getAllAdoptions,
@@ -12,14 +11,11 @@ import {
 
 const router = express.Router();
 
-// Public routes
+// All routes are public
 router.get('/', getAllAdoptions);
 router.get('/:id', getAdoptionById);
 router.get('/location/:location', getAdoptionsByLocation);
 router.get('/breed/:breed', getAdoptionsByBreed);
-
-// Protected routes
-router.use(verifyToken);
 router.post('/', createAdoption);
 router.put('/:id/status', updateAdoptionStatus);
 router.delete('/:id', deleteAdoption);
