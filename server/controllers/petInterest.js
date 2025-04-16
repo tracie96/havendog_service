@@ -62,4 +62,23 @@ export const updateInterestStatus = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
+};
+
+export const getAllInterests = async (req, res) => {
+    try {
+        const { status } = req.query;
+        let query = {};
+        
+        if (status) {
+            query.status = status;
+        }
+
+        const interests = await PetInterest.find(query)
+            .sort({ createdAt: -1 })
+            .populate('petId', 'name type breed');
+
+        res.json(interests);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 }; 
