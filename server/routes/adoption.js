@@ -3,7 +3,7 @@ import {
     createAdoption,
     getAllAdoptions,
     getAdoptionById,
-    updateAdoptionStatus,
+    updateAdoption,
     deleteAdoption,
     getAdoptionsByLocation,
     getAdoptionsByBreed
@@ -17,7 +17,7 @@ router.get('/:id', getAdoptionById);
 router.get('/location/:location', getAdoptionsByLocation);
 router.get('/breed/:breed', getAdoptionsByBreed);
 router.post('/', createAdoption);
-router.put('/:id/status', updateAdoptionStatus);
+router.put('/:id', updateAdoption);
 router.delete('/:id', deleteAdoption);
 
 export default router; 

@@ -52,10 +52,10 @@ export const getAdoptionById = async (req, res) => {
     }
 };
 
-// Update adoption status
-export const updateAdoptionStatus = async (req, res) => {
+// Update adoption listing
+export const updateAdoption = async (req, res) => {
     try {
-        const { status } = req.body;
+        const { name, breed, age, location, imageUrl, description, status } = req.body;
         const adoption = await Adoption.findById(req.params.id);
 
         if (!adoption) {
@@ -64,12 +64,20 @@ export const updateAdoptionStatus = async (req, res) => {
 
         // Authentication check removed - anyone can update
 
-        adoption.status = status;
+        // Update fields if provided
+        if (name !== undefined) adoption.name = name;
+        if (breed !== undefined) adoption.breed = breed;
+        if (age !== undefined) adoption.age = age;
+        if (location !== undefined) adoption.location = location;
+        if (imageUrl !== undefined) adoption.imageUrl = imageUrl;
+        if (description !== undefined) adoption.description = description;
+        if (status !== undefined) adoption.status = status;
+
         await adoption.save();
 
         res.json(adoption);
     } catch (error) {
-        res.status(500).json({ message: 'Error updating adoption status', error: error.message });
+        res.status(500).json({ message: 'Error updating adoption listing', error: error.message });
     }
 };
 
