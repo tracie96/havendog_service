@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
   },
   userType: {
     type: String,
-    enum: ['petOwner', 'vet'],
+    enum: ['petOwner', 'vet', 'admin'],
     required: true
   },
   isBoardingAvailable: {

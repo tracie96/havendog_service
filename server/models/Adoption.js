@@ -20,6 +20,10 @@ const adoptionSchema = new mongoose.Schema({
         enum: ['available', 'pending', 'adopted'],
         default: 'available'
     },
+    isAdopted: {
+        type: Boolean,
+        default: false
+    },
     location: {
         type: String,
         required: true,

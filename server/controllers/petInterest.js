@@ -1,5 +1,6 @@
 import PetInterest from '../models/PetInterest.js';
 import Adoption from '../models/Adoption.js';
+import { sendAdoptionStatusEmail } from '../utils/emailService.js';
 
 export const expressInterest = async (req, res) => {
     try {
@@ -47,13 +48,34 @@ export const updateInterestStatus = async (req, res) => {
         const { id } = req.params;
         const { status } = req.body;
 
-        const interest = await PetInterest.findById(id);
+        // Validate status
+        if (!['approved', 'rejected', 'pending'].includes(status)) {
+            return res.status(400).json({ message: 'Invalid status. Must be approved, rejected, or pending' });
+        }
+
+        const interest = await PetInterest.findById(id).populate('petId', 'name breed');
         if (!interest) {
             return res.status(404).json({ message: 'Interest not found' });
         }
 
+        const oldStatus = interest.status;
         interest.status = status;
         await interest.save();
+
+        // Send email notification if status changed to approved or rejected
+        if ((status === 'approved' || status === 'rejected') && oldStatus !== status) {
+            try {
+                await sendAdoptionStatusEmail({
+                    to: interest.interestedUser.email,
+                    name: interest.interestedUser.name,
+                    petName: interest.petId?.name || 'the pet',
+                    status: status
+                });
+            } catch (emailError) {
+                // Log email error but don't fail the request
+                console.error('Failed to send email notification:', emailError);
+            }
+        }
 
         res.json({
             message: 'Interest status updated successfully',

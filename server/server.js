@@ -20,6 +20,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Request logging middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/adoptions', adoptionRoutes);
@@ -27,7 +33,7 @@ app.use('/api/interests', petInterestRoutes);
 app.use('/api/boarding', boardingRoutes);
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/havendogs')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test')
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
@@ -42,7 +48,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); 

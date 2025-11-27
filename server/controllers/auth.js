@@ -91,6 +91,101 @@ export const login = async (req, res) => {
     }
 };
 
+// Admin login controller
+export const adminLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Check if user is an admin
+        if (user.userType !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin access required.' });
+        }
+
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign(
+            { userId: user._id, userType: user.userType },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({
+            token,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                userType: user.userType
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error logging in', error: error.message });
+    }
+};
+
+// Create admin account (only existing admins can create new admins)
+export const createAdmin = async (req, res) => {
+    try {
+        const { firstName, lastName, email, password, phoneNumber } = req.body;
+
+        // Validate required fields
+        if (!firstName || !lastName || !email || !password) {
+            return res.status(400).json({ message: 'First name, last name, email, and password are required' });
+        }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User with this email already exists' });
+        }
+
+        // Validate password length
+        if (password.length < 6) {
+            return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+        }
+
+        // Create new admin user - userType is always set to 'admin' for this endpoint
+        const admin = new User({
+            firstName,
+            lastName,
+            email,
+            password,
+            userType: 'admin', // Always set to admin, cannot be overridden
+            phoneNumber: phoneNumber || ''
+        });
+
+        await admin.save();
+
+        res.status(201).json({
+            message: 'Admin account created successfully',
+            admin: {
+                id: admin._id,
+                firstName: admin.firstName,
+                lastName: admin.lastName,
+                email: admin.email,
+                userType: admin.userType,
+                phoneNumber: admin.phoneNumber
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating admin account', error: error.message });
+    }
+};
+
 // Update boarding availability
 export const updateBoardingAvailability = async (req, res) => {
     try {

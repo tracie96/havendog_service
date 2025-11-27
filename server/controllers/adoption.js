@@ -27,11 +27,16 @@ export const createAdoption = async (req, res) => {
 // Get all adoption listings
 export const getAllAdoptions = async (req, res) => {
     try {
+        console.log('✅ getAllAdoptions function called');
+        console.log('Request URL:', req.url);
+        console.log('Request Method:', req.method);
         const adoptions = await Adoption.find()
             .populate('postedBy', 'firstName lastName email')
             .sort({ createdAt: -1 });
+        console.log(`Found ${adoptions.length} adoptions`);
         res.json(adoptions);
     } catch (error) {
+        console.error('❌ Error in getAllAdoptions:', error);
         res.status(500).json({ message: 'Error fetching adoption listings', error: error.message });
     }
 };
@@ -55,7 +60,7 @@ export const getAdoptionById = async (req, res) => {
 // Update adoption listing
 export const updateAdoption = async (req, res) => {
     try {
-        const { name, breed, age, location, imageUrl, description, status } = req.body;
+        const { name, breed, age, location, imageUrl, description, status, isAdopted } = req.body;
         const adoption = await Adoption.findById(req.params.id);
 
         if (!adoption) {
@@ -72,6 +77,7 @@ export const updateAdoption = async (req, res) => {
         if (imageUrl !== undefined) adoption.imageUrl = imageUrl;
         if (description !== undefined) adoption.description = description;
         if (status !== undefined) adoption.status = status;
+        if (isAdopted !== undefined) adoption.isAdopted = isAdopted;
 
         await adoption.save();
 

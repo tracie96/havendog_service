@@ -1,12 +1,14 @@
 import express from "express";
 import { login, saveUsers, replaceUser, createPost, getPosts, likePost, createProfessional, publishPost, getAnimalById, updateAnimalById, deleteAnimalById, getProfessionals, getAnimalsByUserId, sendEmail, getProfessionalById, getProfessionalsByCategory, getSuggestions, updatePicturePaths, updateUserPicturePaths, updateAnimalPicturePaths, getAllPosts, getAllProfessionals, getAllUsers, getFilteredProfessionals, handleUser } from "../controllers/auth.js";
-import { verifyToken } from '../middleware/auth.js';
+import { verifyToken, verifyAdmin } from '../middleware/auth.js';
 import * as AuthController from '../controllers/auth.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from "../models/User.js";
 import {
     register,
+    adminLogin,
+    createAdmin,
     updateBoardingAvailability,
     addPet,
     addService,
@@ -133,6 +135,11 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Error logging in', error: error.message });
     }
 });
+
+// Admin login route
+router.post('/admin/login', adminLogin);
+
+router.post('/admin/create', createAdmin);
 
 // Pet routes
 router.post('/pets', verifyToken, addPet);
