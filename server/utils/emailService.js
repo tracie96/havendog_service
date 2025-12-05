@@ -16,29 +16,27 @@ export const sendAdoptionStatusEmail = async ({ to, name, petName, status }) => 
     try {
         const isApproved = status === 'approved';
         const subject = isApproved 
-            ? `Congratulations! Your adoption request for ${petName} has been approved`
+            ? `Your adoption request for ${petName} is being reviewed`
             : `Update on your adoption request for ${petName}`;
 
         const htmlContent = isApproved
             ? `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #4CAF50;">Great News, ${name}!</h2>
-                    <p>We're excited to inform you that your adoption request for <strong>${petName}</strong> has been <strong>approved</strong>!</p>
-                    <p>The pet owner will be in touch with you soon to discuss the next steps in the adoption process.</p>
-                    <p>Thank you for choosing to adopt through HavenDogs!</p>
-                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                    <p style="color: #666; font-size: 12px;">This is an automated message from HavenDogs.</p>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.6;">
+                    <p>Hello amazing dog lover, 💛</p>
+                    <p>Thank you so much for your interest in adopting from Haven Pet Home. We have received your request and our team is currently reviewing it carefully. We will get back to you soon with the next steps.</p>
+                    <p>We truly appreciate your patience and your love for giving dogs a second chance at life. 🐾</p>
+                    <br>
+                    <p>Warm regards,</p>
+                    <p><strong>The Haven Dogs Team</strong></p>
                 </div>
             `
             : `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #f44336;">Update on Your Adoption Request</h2>
-                    <p>Hello ${name},</p>
-                    <p>We wanted to inform you that your adoption request for <strong>${petName}</strong> has been <strong>rejected</strong> at this time.</p>
-                    <p>We encourage you to continue your search for the perfect pet companion. There are many other wonderful pets available for adoption.</p>
-                    <p>Thank you for your interest in adopting through HavenDogs.</p>
-                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                    <p style="color: #666; font-size: 12px;">This is an automated message from HavenDogs.</p>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.6;">
+                    <p>Hello amazing Animal lover, 💛</p>
+                    <p>Thank you so much for believing in us and for your interest in adopting from Haven Pet Home. At this time, we're unable to grant your request due to Location as we are only prioritizing those in Lagos, or other Factors, but we truly appreciate your love for animals. We'll keep your details on file and reach out when another wonderful animal becomes available.</p>
+                    <br>
+                    <p>With love,</p>
+                    <p><strong>The Haven Dogs Team 🐾</strong></p>
                 </div>
             `;
 
