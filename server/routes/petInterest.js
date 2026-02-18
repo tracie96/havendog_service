@@ -5,7 +5,12 @@ import { verifyToken } from '../middleware/auth.js';
 const router = express.Router();
 
 // Public routes
-router.post('/', expressInterest);
+router.post('/', (req, res, next) => {
+    console.log('POST /api/interests route hit');
+    console.log('Request body:', req.body);
+    console.log('Request headers:', req.headers);
+    next();
+}, expressInterest);
 router.get('/pet/:petId', getInterestsByPet);
 router.get('/', getAllInterests);
 

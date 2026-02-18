@@ -4,7 +4,56 @@ import { sendAdoptionStatusEmail } from '../utils/emailService.js';
 
 export const expressInterest = async (req, res) => {
     try {
-        const { petId, interestedUser, message } = req.body;
+        console.log('here');
+        const {
+            petId,
+            fullName,
+            phoneNumber,
+            emailAddress,
+            homeAddress,
+            occupation,
+            workSchedule,
+            // Living Situation
+            accommodationType,
+            ownershipType,
+            petOwnershipAllowed,
+            fencedYard,
+            householdMembers,
+            // Pet Experience
+            ownedDogBefore,
+            previousPetOutcome,
+            currentlyHavePets,
+            currentPetsDetails,
+            currentPetsSterilized,
+            // Lifestyle & Commitment
+            adoptionReason,
+            primaryCaregiver,
+            hoursAloneDaily,
+            sleepingLocation,
+            travelManagement,
+            lifetimeCommitment,
+            // Health & Responsibility
+            willingToVaccinate,
+            willingToProvideVetCare,
+            willingToUseFleaPrevention,
+            willingToSterilize,
+            preferredVeterinarian,
+            // Financial Readiness
+            financiallyPrepared,
+            // Dog-Specific Questions
+            petApplyingFor,
+            openToFosterToAdopt,
+            agreeNotToRehome,
+            willReturnToShelter,
+            // Agreement Section
+            confirmInformationAccurate,
+            understandSelectiveProcess,
+            agreeToHomeCheck,
+            agreeToAdoptionContract,
+            // Legacy fields (for backward compatibility)
+            interestedUser,
+            message
+        } = req.body;
 
         // Check if the pet exists
         const pet = await Adoption.findById(petId);
@@ -12,22 +61,96 @@ export const expressInterest = async (req, res) => {
             return res.status(404).json({ message: 'Pet not found' });
         }
 
-        // Create new interest
-        const interest = new PetInterest({
-            petId,
-            interestedUser,
-            message,
-            status: 'pending'
-        });
+        // Convert hoursAloneDaily to number if it's a string
+        const hoursAloneDailyNum = typeof hoursAloneDaily === 'string' 
+            ? parseInt(hoursAloneDaily, 10) 
+            : hoursAloneDaily;
 
+        // Create new interest with all fields
+        const interestData = {
+            petId,
+            // Basic Information
+            fullName,
+            phoneNumber,
+            emailAddress,
+            homeAddress,
+            occupation,
+            workSchedule,
+            // Living Situation
+            accommodationType,
+            ownershipType,
+            fencedYard,
+            householdMembers,
+            // Pet Experience
+            ownedDogBefore,
+            currentlyHavePets,
+            // Lifestyle & Commitment
+            adoptionReason,
+            primaryCaregiver,
+            hoursAloneDaily: hoursAloneDailyNum,
+            sleepingLocation,
+            travelManagement,
+            lifetimeCommitment,
+            // Health & Responsibility
+            willingToVaccinate,
+            willingToProvideVetCare,
+            willingToUseFleaPrevention,
+            willingToSterilize,
+            // Financial Readiness
+            financiallyPrepared,
+            // Dog-Specific Questions
+            petApplyingFor: petApplyingFor || pet.name,
+            openToFosterToAdopt,
+            agreeNotToRehome,
+            willReturnToShelter,
+            // Agreement Section
+            confirmInformationAccurate,
+            understandSelectiveProcess,
+            agreeToHomeCheck,
+            agreeToAdoptionContract,
+            status: 'pending'
+        };
+
+        // Add conditional fields
+        if (ownershipType === 'rent') {
+            interestData.petOwnershipAllowed = petOwnershipAllowed;
+        }
+
+        if (ownedDogBefore === 'yes') {
+            interestData.previousPetOutcome = previousPetOutcome;
+        }
+
+        if (currentlyHavePets === 'yes') {
+            interestData.currentPetsDetails = currentPetsDetails;
+            interestData.currentPetsSterilized = currentPetsSterilized;
+        }
+
+        if (preferredVeterinarian) {
+            interestData.preferredVeterinarian = preferredVeterinarian;
+        }
+
+        // Always populate legacy fields for backward compatibility
+        // Use provided legacy fields if available, otherwise populate from new fields
+        interestData.interestedUser = interestedUser || {
+            name: fullName,
+            email: emailAddress,
+            phone: phoneNumber
+        };
+        interestData.message = message || adoptionReason || '';
+
+        const interest = new PetInterest(interestData);
         await interest.save();
 
         res.status(201).json({
-            message: 'Interest expressed successfully',
+            message: 'Expression of Interest submitted successfully',
             interest
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error creating interest:', error);
+        res.status(500).json({ 
+            message: error.message || 'Failed to submit expression of interest',
+            error: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 };
 
@@ -65,12 +188,18 @@ export const updateInterestStatus = async (req, res) => {
         // Send email notification if status changed to approved or rejected
         if ((status === 'approved' || status === 'rejected') && oldStatus !== status) {
             try {
-                await sendAdoptionStatusEmail({
-                    to: interest.interestedUser.email,
-                    name: interest.interestedUser.name,
-                    petName: interest.petId?.name || 'the pet',
-                    status: status
-                });
+                // Support both new and legacy field structures
+                const email = interest.emailAddress || interest.interestedUser?.email;
+                const name = interest.fullName || interest.interestedUser?.name;
+                
+                if (email && name) {
+                    await sendAdoptionStatusEmail({
+                        to: email,
+                        name: name,
+                        petName: interest.petId?.name || 'the pet',
+                        status: status
+                    });
+                }
             } catch (emailError) {
                 // Log email error but don't fail the request
                 console.error('Failed to send email notification:', emailError);
