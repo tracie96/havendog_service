@@ -176,14 +176,18 @@ export const updateInterestStatus = async (req, res) => {
             return res.status(400).json({ message: 'Invalid status. Must be approved, rejected, or pending' });
         }
 
-        const interest = await PetInterest.findById(id).populate('petId', 'name breed');
-        if (!interest) {
+        const existing = await PetInterest.findById(id).select('status emailAddress fullName interestedUser').populate('petId', 'name breed');
+        if (!existing) {
             return res.status(404).json({ message: 'Interest not found' });
         }
 
-        const oldStatus = interest.status;
-        interest.status = status;
-        await interest.save();
+        const oldStatus = existing.status;
+        // Update status only; skip full-document validation for this route
+        const interest = await PetInterest.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true, runValidators: false }
+        ).populate('petId', 'name breed');
 
         // Send email notification if status changed to approved or rejected
         if ((status === 'approved' || status === 'rejected') && oldStatus !== status) {

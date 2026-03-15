@@ -14,7 +14,6 @@ router.post('/', (req, res, next) => {
 router.get('/pet/:petId', getInterestsByPet);
 router.get('/', getAllInterests);
 
-// Protected routes (require authentication)
 router.put('/:id/status', verifyToken, updateInterestStatus);
 
 export default router; 
