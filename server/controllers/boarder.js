@@ -2,14 +2,15 @@ import Boarder from '../models/Boarder.js';
 
 export const createBoarder = async (req, res) => {
   try {
-    const { nameOfBreed, ownerInformation, priceAgreed, checkInDate, checkoutDate } = req.body;
+    const { dogName, nameOfBreed, ownerInformation, priceAgreed, checkInDate, checkoutDate } = req.body;
 
     const boarder = new Boarder({
+      ...(dogName && { dogName }),
       nameOfBreed,
       ownerInformation,
       priceAgreed: Number(priceAgreed),
       checkInDate: new Date(checkInDate),
-      checkoutDate: new Date(checkoutDate)
+      ...(checkoutDate && { checkoutDate: new Date(checkoutDate) })
     });
 
     await boarder.save();

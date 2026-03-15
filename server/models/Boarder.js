@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 
 const boarderSchema = new mongoose.Schema({
+  dogName: {
+    type: String,
+    trim: true
+  },
   nameOfBreed: {
     type: String,
     required: true,
@@ -8,7 +12,7 @@ const boarderSchema = new mongoose.Schema({
   },
   ownerInformation: {
     name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, trim: true, lowercase: true },
+    email: { type: String, trim: true, lowercase: true },
     phone: { type: String, required: true, trim: true }
   },
   priceAgreed: {
@@ -21,8 +25,7 @@ const boarderSchema = new mongoose.Schema({
     required: true
   },
   checkoutDate: {
-    type: Date,
-    required: true
+    type: Date
   },
   createdAt: {
     type: Date,
