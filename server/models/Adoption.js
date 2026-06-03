@@ -13,7 +13,7 @@ const adoptionSchema = new mongoose.Schema({
     },
     age: {
         type: Number,
-        required: true
+        required: true // total age in months (e.g. 36 = 36 months)
     },
     status: {
         type: String,
@@ -23,6 +23,14 @@ const adoptionSchema = new mongoose.Schema({
     isAdopted: {
         type: Boolean,
         default: false
+    },
+    adopterName: {
+        type: String,
+        trim: true
+    },
+    adopterPhone: {
+        type: String,
+        trim: true
     },
     location: {
         type: String,

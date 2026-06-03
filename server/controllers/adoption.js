@@ -60,7 +60,7 @@ export const getAdoptionById = async (req, res) => {
 // Update adoption listing
 export const updateAdoption = async (req, res) => {
     try {
-        const { name, breed, age, location, imageUrl, description, status, isAdopted } = req.body;
+        const { name, breed, age, location, imageUrl, description, status, isAdopted, adopterName, adopterPhone } = req.body;
         const adoption = await Adoption.findById(req.params.id);
 
         if (!adoption) {
@@ -76,8 +76,24 @@ export const updateAdoption = async (req, res) => {
         if (location !== undefined) adoption.location = location;
         if (imageUrl !== undefined) adoption.imageUrl = imageUrl;
         if (description !== undefined) adoption.description = description;
-        if (status !== undefined) adoption.status = status;
+        if (adopterName !== undefined) adoption.adopterName = adopterName?.trim() || '';
+        if (adopterPhone !== undefined) adoption.adopterPhone = adopterPhone?.trim() || '';
+        if (status !== undefined) {
+            adoption.status = status;
+            adoption.isAdopted = status === 'adopted';
+        }
         if (isAdopted !== undefined) adoption.isAdopted = isAdopted;
+
+        const effectiveStatus = adoption.status;
+        if (effectiveStatus === 'adopted') {
+            const finalAdopterName = (adoption.adopterName || '').trim();
+            const finalAdopterPhone = (adoption.adopterPhone || '').trim();
+            if (!finalAdopterName || !finalAdopterPhone) {
+                return res.status(400).json({
+                    message: 'Adopter name and phone number are required before marking a pet as adopted'
+                });
+            }
+        }
 
         await adoption.save();
 
