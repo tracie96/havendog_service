@@ -136,7 +136,7 @@ const buildRejectedAdoptionEmail = () => `
               <p style="margin: 0 0 16px;">Hello,</p>
               <p style="margin: 0 0 16px;">
                 Thank you so much for believing in us and for your interest in adopting from ${SHELTER.name}.
-                At this time, we are unable to grant your request due to location (we are currently prioritizing applicants in Lagos) or other factors.
+                At this time, we are unable to grant your request. This may be because the dog has already been adopted, because we are currently prioritizing applicants in Lagos, or due to other factors.
               </p>
               <p style="margin: 0 0 24px;">
                 We truly appreciate your love for animals. We will keep your details on file and reach out when another wonderful animal becomes available.
