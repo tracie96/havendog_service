@@ -9,6 +9,7 @@ const SHELTER = {
     phone: process.env.SHELTER_PHONE || '+234 810-969-0608',
     email: process.env.SHELTER_EMAIL || 'info@havenpethome.com',
     visitDays: process.env.SHELTER_VISIT_DAYS || 'Every Saturday',
+    visitHours: process.env.SHELTER_VISIT_HOURS || '10:00 AM – 2:00 PM',
 };
 
 const buildApprovedAdoptionEmail = ({ name, petName }) => {
@@ -51,12 +52,12 @@ const buildApprovedAdoptionEmail = ({ name, petName }) => {
                     <p style="margin: 0 0 6px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: #1a5f4a; font-weight: 700;">Shelter visit invitation</p>
                     <h2 style="margin: 0 0 14px; font-size: 20px; color: #1a3d32;">You are invited to meet ${petName}</h2>
                     <p style="margin: 0 0 16px; color: #444444;">
-                      Please visit our shelter on <strong>${SHELTER.visitDays}</strong> to meet ${petName} in person and complete the next steps of your adoption.
+                      You are warmly invited to visit our shelter and meet ${petName} in person. No appointment is needed — simply drop in on any <strong>${SHELTER.visitDays}</strong> during interview hours.
                     </p>
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                       <tr>
                         <td style="padding: 10px 0; border-top: 1px solid #d4ede4; color: #555555; font-size: 15px;">
-                          <strong style="color: #1a5f4a;">When:</strong> ${SHELTER.visitDays}
+                          <strong style="color: #1a5f4a;">When:</strong> ${SHELTER.visitDays}, ${SHELTER.visitHours} (interview hours)
                         </td>
                       </tr>
                       <tr>
@@ -74,12 +75,12 @@ const buildApprovedAdoptionEmail = ({ name, petName }) => {
                 </tr>
               </table>
 
-              <!-- Reply CTA -->
+              <!-- Visit note -->
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 0 0 24px; background-color: #fff8e8; border-left: 4px solid #e6a817; border-radius: 6px;">
                 <tr>
                   <td style="padding: 16px 18px;">
                     <p style="margin: 0; font-size: 15px; color: #5c4a1a;">
-                      <strong>Please reply to this email</strong> and let us know which Saturday you plan to visit, so we can prepare for your arrival.
+                      <strong>Please note:</strong> there is no need to pick a specific date or reply to schedule a visit. Just come on any Saturday between ${SHELTER.visitHours} and we will be happy to meet with you.
                     </p>
                   </td>
                 </tr>
