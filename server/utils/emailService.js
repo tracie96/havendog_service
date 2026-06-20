@@ -5,7 +5,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const SHELTER = {
     name: process.env.SHELTER_NAME || 'Haven Pet Home',
-    address: process.env.SHELTER_ADDRESS || 'Old Federal Secretariat, Ikoyi, Lagos 106104, Lagos',
+    address: process.env.SHELTER_ADDRESS || 'First Bank Building, Alagbon, Ikoyi, Lagos',
     phone: process.env.SHELTER_PHONE || '+234 810-969-0608',
     email: process.env.SHELTER_EMAIL || 'info@havenpethome.com',
     visitDays: process.env.SHELTER_VISIT_DAYS || 'Every Saturday',
