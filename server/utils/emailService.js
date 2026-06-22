@@ -21,7 +21,7 @@ const buildApprovedAdoptionEmail = ({ name, petName }) => {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Adoption Approved</title>
+  <title>Adoption Interview Invitation</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: Arial, Helvetica, sans-serif;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f6f8; padding: 32px 16px;">
@@ -32,7 +32,7 @@ const buildApprovedAdoptionEmail = ({ name, petName }) => {
           <tr>
             <td style="background: linear-gradient(135deg, #1a5f4a 0%, #2d8a6e 100%); padding: 32px 28px; text-align: center;">
               <p style="margin: 0 0 8px; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.85);">Haven Dogs</p>
-              <h1 style="margin: 0; font-size: 26px; line-height: 1.3; color: #ffffff; font-weight: 700;">Your adoption request is approved!</h1>
+              <h1 style="margin: 0; font-size: 26px; line-height: 1.3; color: #ffffff; font-weight: 700;">Your adoption interview — final step</h1>
             </td>
           </tr>
 
@@ -43,16 +43,17 @@ const buildApprovedAdoptionEmail = ({ name, petName }) => {
               <p style="margin: 0 0 20px;">
                 Thank you for your interest in adopting from <strong>${SHELTER.name}</strong>.
                 We are delighted to let you know that your request to adopt <strong>${petName}</strong> has been <span style="color: #1a5f4a; font-weight: 700;">approved</span>.
+                The next and final step is an in-person <strong>adoption interview</strong> at our shelter, where you will meet ${petName} and complete the process.
               </p>
 
-              <!-- Invitation card -->
+              <!-- Interview invitation card -->
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 0 0 24px; background-color: #f0faf6; border: 1px solid #b8e6d4; border-radius: 10px;">
                 <tr>
                   <td style="padding: 22px 20px;">
-                    <p style="margin: 0 0 6px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: #1a5f4a; font-weight: 700;">Shelter visit invitation</p>
-                    <h2 style="margin: 0 0 14px; font-size: 20px; color: #1a3d32;">You are invited to meet ${petName}</h2>
+                    <p style="margin: 0 0 6px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: #1a5f4a; font-weight: 700;">Adoption interview invitation</p>
+                    <h2 style="margin: 0 0 14px; font-size: 20px; color: #1a3d32;">You are invited to interview for ${petName}</h2>
                     <p style="margin: 0 0 16px; color: #444444;">
-                      You are warmly invited to visit our shelter and meet ${petName} in person. No appointment is needed — simply drop in on any <strong>${SHELTER.visitDays}</strong> during interview hours.
+                      Please visit our shelter for your adoption interview and to meet ${petName} in person. No appointment is needed — simply drop in on any <strong>${SHELTER.visitDays}</strong> during interview hours.
                     </p>
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                       <tr>
@@ -75,12 +76,12 @@ const buildApprovedAdoptionEmail = ({ name, petName }) => {
                 </tr>
               </table>
 
-              <!-- Visit note -->
+              <!-- Interview note -->
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 0 0 24px; background-color: #fff8e8; border-left: 4px solid #e6a817; border-radius: 6px;">
                 <tr>
                   <td style="padding: 16px 18px;">
                     <p style="margin: 0; font-size: 15px; color: #5c4a1a;">
-                      <strong>Please note:</strong> there is no need to pick a specific date or reply to schedule a visit. Just come on any Saturday between ${SHELTER.visitHours} and we will be happy to meet with you.
+                      <strong>Please note:</strong> there is no need to pick a specific date or reply to schedule your interview. Just come on any Saturday between ${SHELTER.visitHours} and we will be happy to meet with you.
                     </p>
                   </td>
                 </tr>
@@ -166,7 +167,7 @@ export const sendAdoptionStatusEmail = async ({ to, name, petName, status }) => 
     try {
         const isApproved = status === 'approved';
         const subject = isApproved
-            ? `You're invited to visit the shelter — ${petName} adoption approved`
+            ? `Your adoption interview for ${petName} — final step`
             : `Update on your adoption request for ${petName}`;
 
         const htmlContent = isApproved
