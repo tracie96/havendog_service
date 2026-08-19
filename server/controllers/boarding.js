@@ -8,8 +8,24 @@ export const createBoardingSubmission = async (req, res) => {
             emergency_contact,
             veterinarian,
             boarding,
-            documents
+            documents,
+            agreedToBoardingTerms,
+            confirmedInformationAccurate,
+            ownerDeclaration,
+            termsAgreedAt
         } = req.body;
+
+        if (!agreedToBoardingTerms || !confirmedInformationAccurate) {
+            return res.status(400).json({
+                message: 'You must complete the Owner’s Declaration and agree to the Boarding Agreement.'
+            });
+        }
+
+        if (!ownerDeclaration?.ownerName || !ownerDeclaration?.signature || !ownerDeclaration?.date) {
+            return res.status(400).json({
+                message: 'Please provide the owner’s name, signature, and date on the declaration.'
+            });
+        }
 
         const boardingSubmission = new Boarding({
             owner,
@@ -17,7 +33,11 @@ export const createBoardingSubmission = async (req, res) => {
             emergency_contact,
             veterinarian,
             boarding,
-            documents
+            documents,
+            agreedToBoardingTerms: true,
+            confirmedInformationAccurate: true,
+            ownerDeclaration,
+            termsAgreedAt: termsAgreedAt || new Date()
         });
 
         await boardingSubmission.save();

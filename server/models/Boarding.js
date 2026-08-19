@@ -12,6 +12,9 @@ const boardingSchema = new mongoose.Schema({
     breed: { type: String, required: true },
     allergies: { type: String },
     medications: { type: String },
+    lastVaccinated: { type: String, enum: ['yes', 'no'] },
+    onTickMedicine: { type: String, enum: ['yes', 'no'] },
+    dogSize: { type: String, enum: ['small', 'medium', 'large'] },
     feedingInstructions: { type: String },
     specialInstructions: { type: String }
   },
@@ -40,6 +43,24 @@ const boardingSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  agreedToBoardingTerms: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  confirmedInformationAccurate: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  ownerDeclaration: {
+    ownerName: { type: String },
+    signature: { type: String },
+    date: { type: Date }
+  },
+  termsAgreedAt: {
+    type: Date
   }
 });
 

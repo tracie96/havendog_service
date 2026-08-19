@@ -9,6 +9,7 @@ import adoptionRoutes from './routes/adoption.js';
 import petInterestRoutes from './routes/petInterest.js';
 import boardingRoutes from './routes/boarding.js';
 import boarderRoutes from './routes/boarder.js';
+import surrenderRoutes from './routes/surrender.js';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use('/api/adoptions', adoptionRoutes);
 app.use('/api/interests', petInterestRoutes);
 app.use('/api/boarding', boardingRoutes);
 app.use('/api/boarders', boarderRoutes);
+app.use('/api/surrenders', surrenderRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/test')
