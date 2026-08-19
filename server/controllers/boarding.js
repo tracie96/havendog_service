@@ -1,4 +1,5 @@
 import Boarding from '../models/Boarding.js';
+import { sendBoardingRequestStaffEmail } from '../utils/emailService.js';
 
 export const createBoardingSubmission = async (req, res) => {
     try {
@@ -41,6 +42,8 @@ export const createBoardingSubmission = async (req, res) => {
         });
 
         await boardingSubmission.save();
+
+        await sendBoardingRequestStaffEmail(boardingSubmission);
 
         res.status(201).json({
             message: 'Boarding submission created successfully',

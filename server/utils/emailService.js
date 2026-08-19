@@ -154,6 +154,147 @@ const buildRejectedAdoptionEmail = () => `
 </html>
 `.trim();
 
+const STAFF_NOTIFY_EMAILS = (process.env.STAFF_NOTIFY_EMAILS || 'fahida.emetumah@gmail.com,tracyamara07@gmail.com')
+    .split(',')
+    .map((email) => email.trim())
+    .filter(Boolean);
+
+const formatValue = (value) => {
+    if (value === undefined || value === null || value === '') return 'N/A';
+    if (value instanceof Date) return value.toLocaleDateString();
+    return String(value);
+};
+
+const formatDate = (value) => {
+    if (!value) return 'N/A';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+};
+
+const staffEmailLayout = (title, bodyHtml) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${title}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: Arial, Helvetica, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f6f8; padding: 32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden;">
+          <tr>
+            <td style="background: linear-gradient(135deg, #1a5f4a 0%, #2d8a6e 100%); padding: 28px; text-align: center;">
+              <p style="margin: 0 0 8px; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.85);">Haven Pet Home</p>
+              <h1 style="margin: 0; font-size: 22px; color: #ffffff;">${title}</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px; color: #333333; font-size: 15px; line-height: 1.6;">
+              ${bodyHtml}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`.trim();
+
+const detailRow = (label, value) => `
+  <tr>
+    <td style="padding: 8px 0; border-bottom: 1px solid #eee; color: #666; width: 40%;"><strong>${label}</strong></td>
+    <td style="padding: 8px 0; border-bottom: 1px solid #eee; color: #333;">${formatValue(value)}</td>
+  </tr>
+`;
+
+const sendStaffEmail = async ({ subject, html }) => {
+    try {
+        await sgMail.send({
+            to: STAFF_NOTIFY_EMAILS,
+            from: process.env.SENDGRID_FROM_EMAIL || 'noreply@havendogs.com',
+            replyTo: process.env.SENDGRID_REPLY_TO_EMAIL || SHELTER.email,
+            subject,
+            html,
+        });
+        console.log(`✅ Staff notification sent: ${subject}`);
+        return { success: true };
+    } catch (error) {
+        console.error('❌ Error sending staff notification email:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+export const sendBoardingRequestStaffEmail = async (submission) => {
+    const owner = submission.owner || {};
+    const pet = submission.pet || {};
+    const boarding = submission.boarding || {};
+
+    const html = staffEmailLayout(
+        'New boarding request',
+        `
+          <p>A new pet boarding request has been submitted.</p>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            ${detailRow('Owner', owner.name)}
+            ${detailRow('Email', owner.email)}
+            ${detailRow('Phone', owner.phone)}
+            ${detailRow('Pet name', pet.name)}
+            ${detailRow('Breed', pet.breed)}
+            ${detailRow('Age', pet.age)}
+            ${detailRow('Size', pet.dogSize)}
+            ${detailRow('Last vaccinated', pet.lastVaccinated)}
+            ${detailRow('On tick medicine', pet.onTickMedicine)}
+            ${detailRow('Check-in', formatDate(boarding.startDate))}
+            ${detailRow('Check-out', formatDate(boarding.endDate))}
+          </table>
+          <p style="margin: 20px 0 0; color: #666;">Please review this request in the admin dashboard under Boarding Requests.</p>
+        `
+    );
+
+    return sendStaffEmail({
+        subject: `New boarding request — ${pet.name || 'pet'} from ${owner.name || 'an owner'}`,
+        html,
+    });
+};
+
+export const sendSurrenderRequestStaffEmail = async (submission) => {
+    const surrenderer = submission.surrenderer || {};
+    const pet = submission.pet || {};
+    const reason = submission.reason || {};
+    const species = pet.species === 'other' ? pet.speciesOther || 'other' : pet.species;
+    const reasons = Array.isArray(reason.reasons) && reason.reasons.length
+        ? reason.reasons.join(', ')
+        : 'N/A';
+
+    const html = staffEmailLayout(
+        'New pet surrender request',
+        `
+          <p>A new pet surrender / relinquishment form has been submitted.</p>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            ${detailRow('Surrenderer', surrenderer.fullName)}
+            ${detailRow('Email', surrenderer.email)}
+            ${detailRow('Phone', surrenderer.phone)}
+            ${detailRow('WhatsApp', surrenderer.whatsapp)}
+            ${detailRow('Pet name', pet.name)}
+            ${detailRow('Species', species)}
+            ${detailRow('Breed', pet.breed)}
+            ${detailRow('Sex', pet.sex)}
+            ${detailRow('Age', pet.age)}
+            ${detailRow('Reasons', reasons)}
+            ${detailRow('Explanation', reason.explanation)}
+          </table>
+          <p style="margin: 20px 0 0; color: #666;">Please review this request in the admin dashboard under Pet Surrenders.</p>
+        `
+    );
+
+    return sendStaffEmail({
+        subject: `New pet surrender — ${pet.name || 'pet'} from ${surrenderer.fullName || 'a surrenderer'}`,
+        html,
+    });
+};
+
 /**
  * Send adoption request status email
  * @param {Object} options - Email options

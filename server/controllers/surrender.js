@@ -1,4 +1,5 @@
 import Surrender from '../models/Surrender.js';
+import { sendSurrenderRequestStaffEmail } from '../utils/emailService.js';
 
 export const createSurrenderSubmission = async (req, res) => {
     try {
@@ -41,6 +42,8 @@ export const createSurrenderSubmission = async (req, res) => {
         });
 
         await submission.save();
+
+        await sendSurrenderRequestStaffEmail(submission);
 
         res.status(201).json({
             message: 'Pet surrender form submitted successfully',
