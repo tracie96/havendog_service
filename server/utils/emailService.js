@@ -295,6 +295,168 @@ export const sendSurrenderRequestStaffEmail = async (submission) => {
     });
 };
 
+const buildShelterVisitCard = ({ title, intro, petName, extraRows = '' }) => `
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 0 0 24px; background-color: #f0faf6; border: 1px solid #b8e6d4; border-radius: 10px;">
+    <tr>
+      <td style="padding: 22px 20px;">
+        <p style="margin: 0 0 6px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: #1a5f4a; font-weight: 700;">${title}</p>
+        <p style="margin: 0 0 16px; color: #444444;">${intro}</p>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+          <tr>
+            <td style="padding: 10px 0; border-top: 1px solid #d4ede4; color: #555555; font-size: 15px;">
+              <strong style="color: #1a5f4a;">Pet:</strong> ${petName}
+            </td>
+          </tr>
+          ${extraRows}
+          <tr>
+            <td style="padding: 10px 0; border-top: 1px solid #d4ede4; color: #555555; font-size: 15px;">
+              <strong style="color: #1a5f4a;">Where:</strong> ${SHELTER.address}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 0; border-top: 1px solid #d4ede4; color: #555555; font-size: 15px;">
+              <strong style="color: #1a5f4a;">Contact:</strong> ${SHELTER.phone} &middot; ${SHELTER.email}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+`;
+
+const buildAcceptedBoardingEmail = ({ name, petName, startDate, endDate }) => {
+    const greeting = name ? `Hello ${name}` : 'Hello';
+    const extraRows = `
+      <tr>
+        <td style="padding: 10px 0; border-top: 1px solid #d4ede4; color: #555555; font-size: 15px;">
+          <strong style="color: #1a5f4a;">Check-in:</strong> ${formatDate(startDate)}
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 10px 0; border-top: 1px solid #d4ede4; color: #555555; font-size: 15px;">
+          <strong style="color: #1a5f4a;">Check-out:</strong> ${formatDate(endDate)}
+        </td>
+      </tr>
+    `;
+
+    return staffEmailLayout(
+        'Your boarding request is approved',
+        `
+          <p style="margin: 0 0 16px;">${greeting},</p>
+          <p style="margin: 0 0 20px;">
+            Great news — your boarding request for <strong>${petName}</strong> has been <strong style="color: #1a5f4a;">approved</strong>.
+            You may now bring your pet to our shelter for boarding.
+          </p>
+          ${buildShelterVisitCard({
+              title: 'Bring your pet to the shelter',
+              intro: 'Please bring your pet to the shelter on your scheduled dates. When you arrive, please have the following ready:',
+              petName,
+              extraRows,
+          })}
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 0 0 24px; background-color: #fff8e8; border-left: 4px solid #e6a817; border-radius: 6px;">
+            <tr>
+              <td style="padding: 16px 18px;">
+                <p style="margin: 0 0 10px; font-size: 15px; color: #5c4a1a;"><strong>Please bring:</strong></p>
+                <p style="margin: 0 0 8px; font-size: 15px; color: #5c4a1a;">1. An <strong>updated vaccination card</strong> for ${petName}</p>
+                <p style="margin: 0; font-size: 15px; color: #5c4a1a;">2. Proof that your pet is on <strong>tick/flea medication</strong> (or bring the medication with you)</p>
+              </td>
+            </tr>
+          </table>
+          <p style="margin: 0; color: #555555;">
+            If you have any questions before drop-off, please reply to this email or contact us using the details above.
+          </p>
+        `
+    );
+};
+
+const buildAcceptedSurrenderEmail = ({ name, petName }) => {
+    const greeting = name ? `Hello ${name}` : 'Hello';
+
+    return staffEmailLayout(
+        'Your surrender request has been accepted',
+        `
+          <p style="margin: 0 0 16px;">${greeting},</p>
+          <p style="margin: 0 0 20px;">
+            We have reviewed your surrender request for <strong>${petName}</strong> and it has been <strong style="color: #1a5f4a;">accepted</strong>.
+            You may now bring the animal to our shelter to complete the surrender process.
+          </p>
+          ${buildShelterVisitCard({
+              title: 'Bring your pet to the shelter',
+              intro: 'Please bring the animal to our shelter at your earliest convenience. When you arrive, please have the following ready:',
+              petName,
+          })}
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 0 0 24px; background-color: #fff8e8; border-left: 4px solid #e6a817; border-radius: 6px;">
+            <tr>
+              <td style="padding: 16px 18px;">
+                <p style="margin: 0 0 10px; font-size: 15px; color: #5c4a1a;"><strong>Please bring:</strong></p>
+                <p style="margin: 0 0 8px; font-size: 15px; color: #5c4a1a;">1. An <strong>updated vaccination card</strong> for ${petName}</p>
+                <p style="margin: 0; font-size: 15px; color: #5c4a1a;">2. Proof that the pet is on <strong>tick/flea medication</strong> (or bring the medication with you)</p>
+              </td>
+            </tr>
+          </table>
+          <p style="margin: 0; color: #555555;">
+            Thank you for reaching out to ${SHELTER.name}. If you need directions or have questions before your visit, please contact us using the details above.
+          </p>
+        `
+    );
+};
+
+const sendCustomerEmail = async ({ to, subject, html }) => {
+    try {
+        await sgMail.send({
+            to,
+            from: process.env.SENDGRID_FROM_EMAIL || 'noreply@havendogs.com',
+            replyTo: process.env.SENDGRID_REPLY_TO_EMAIL || SHELTER.email,
+            subject,
+            html,
+        });
+        console.log(`✅ Customer email sent to ${to}: ${subject}`);
+        return { success: true };
+    } catch (error) {
+        console.error('❌ Error sending customer email:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+export const sendBoardingAcceptedEmail = async (submission) => {
+    const owner = submission.owner || {};
+    const pet = submission.pet || {};
+    const boarding = submission.boarding || {};
+
+    if (!owner.email) {
+        return { success: false, error: 'Owner email missing' };
+    }
+
+    return sendCustomerEmail({
+        to: owner.email,
+        subject: `Boarding approved — bring ${pet.name || 'your pet'} to the shelter`,
+        html: buildAcceptedBoardingEmail({
+            name: owner.name,
+            petName: pet.name || 'your pet',
+            startDate: boarding.startDate,
+            endDate: boarding.endDate,
+        }),
+    });
+};
+
+export const sendSurrenderAcceptedEmail = async (submission) => {
+    const surrenderer = submission.surrenderer || {};
+    const pet = submission.pet || {};
+
+    if (!surrenderer.email) {
+        return { success: false, error: 'Surrenderer email missing' };
+    }
+
+    return sendCustomerEmail({
+        to: surrenderer.email,
+        subject: `Surrender accepted — bring ${pet.name || 'your pet'} to the shelter`,
+        html: buildAcceptedSurrenderEmail({
+            name: surrenderer.fullName,
+            petName: pet.name || 'your pet',
+        }),
+    });
+};
+
 /**
  * Send adoption request status email
  * @param {Object} options - Email options

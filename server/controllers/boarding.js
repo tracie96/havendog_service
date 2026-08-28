@@ -1,5 +1,5 @@
 import Boarding from '../models/Boarding.js';
-import { sendBoardingRequestStaffEmail } from '../utils/emailService.js';
+import { sendBoardingRequestStaffEmail, sendBoardingAcceptedEmail } from '../utils/emailService.js';
 
 export const createBoardingSubmission = async (req, res) => {
     try {
@@ -97,8 +97,13 @@ export const updateBoardingStatus = async (req, res) => {
             return res.status(404).json({ message: 'Boarding submission not found' });
         }
 
+        const previousStatus = submission.status;
         submission.status = status;
         await submission.save();
+
+        if (status === 'approved' && previousStatus !== 'approved') {
+            await sendBoardingAcceptedEmail(submission);
+        }
 
         res.json({
             message: 'Boarding status updated successfully',

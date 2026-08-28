@@ -1,5 +1,5 @@
 import Surrender from '../models/Surrender.js';
-import { sendSurrenderRequestStaffEmail } from '../utils/emailService.js';
+import { sendSurrenderRequestStaffEmail, sendSurrenderAcceptedEmail } from '../utils/emailService.js';
 
 export const createSurrenderSubmission = async (req, res) => {
     try {
@@ -86,6 +86,8 @@ export const updateSurrenderStatus = async (req, res) => {
             return res.status(404).json({ message: 'Surrender submission not found' });
         }
 
+        const previousStatus = submission.status;
+
         if (status) {
             submission.status = status;
         }
@@ -98,6 +100,10 @@ export const updateSurrenderStatus = async (req, res) => {
         }
 
         await submission.save();
+
+        if (status === 'accepted' && previousStatus !== 'accepted') {
+            await sendSurrenderAcceptedEmail(submission);
+        }
 
         res.json({
             message: 'Surrender updated successfully',

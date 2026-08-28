@@ -33,6 +33,7 @@ const surrenderSchema = new mongoose.Schema({
     vaccinated: { type: String, enum: ['yes', 'no', 'unknown'] },
     lastVaccinationDate: { type: String },
     rabiesVaccinated: { type: String, enum: ['yes', 'no', 'unknown'] },
+    onTickMedicine: { type: String, enum: ['yes', 'no', 'unknown'] },
     sterilized: { type: String, enum: ['yes', 'no'] },
     hadLitter: { type: String, enum: ['yes', 'no'] },
     knownConditions: { type: String },
