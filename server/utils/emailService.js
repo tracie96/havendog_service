@@ -295,6 +295,36 @@ export const sendSurrenderRequestStaffEmail = async (submission) => {
     });
 };
 
+export const sendInterestStaffEmail = async (interest) => {
+    const pet = interest.petId || {};
+    const petName = typeof pet === 'object' ? pet.name : undefined;
+    const isFoster = interest.interestType === 'foster';
+    const typeLabel = isFoster ? 'foster (2 weeks)' : 'adoption';
+
+    const html = staffEmailLayout(
+        isFoster ? 'New foster interest' : 'New adoption interest',
+        `
+          <p>A new ${typeLabel} expression of interest has been submitted.</p>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            ${detailRow('Type', isFoster ? 'Foster — 2 weeks' : 'Adoption')}
+            ${detailRow('Pet', petName || interest.petApplyingFor)}
+            ${detailRow('Name', interest.fullName)}
+            ${detailRow('Email', interest.emailAddress)}
+            ${detailRow('Phone', interest.phoneNumber)}
+            ${detailRow('Address', interest.homeAddress)}
+            ${isFoster ? '' : detailRow('Occupation', interest.occupation)}
+            ${isFoster ? '' : detailRow('Reason', interest.adoptionReason)}
+          </table>
+          <p style="margin: 20px 0 0; color: #666;">Please review this request in the admin dashboard under Pet Interest Requests.</p>
+        `
+    );
+
+    return sendStaffEmail({
+        subject: `New ${typeLabel} interest — ${petName || interest.petApplyingFor || 'pet'} from ${interest.fullName || 'an applicant'}`,
+        html,
+    });
+};
+
 const buildShelterVisitCard = ({ title, intro, petName, extraRows = '' }) => `
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 0 0 24px; background-color: #f0faf6; border: 1px solid #b8e6d4; border-radius: 10px;">
     <tr>
