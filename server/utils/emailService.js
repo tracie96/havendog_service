@@ -9,7 +9,7 @@ const SHELTER = {
     phone: process.env.SHELTER_PHONE || '+234 810-969-0608',
     email: process.env.SHELTER_EMAIL || 'info@havenpethome.com',
     visitDays: process.env.SHELTER_VISIT_DAYS || 'Every Saturday',
-    visitHours: process.env.SHELTER_VISIT_HOURS || '10:00 AM – 2:00 PM',
+    visitHours: process.env.SHELTER_VISIT_HOURS || '10:00 AM – 12:00 PM',
 };
 
 const buildApprovedAdoptionEmail = ({ name, petName }) => {
