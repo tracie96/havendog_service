@@ -42,7 +42,7 @@ const buildApprovedAdoptionEmail = ({ name, petName }) => {
               <p style="margin: 0 0 16px;">${greeting},</p>
               <p style="margin: 0 0 20px;">
                 Thank you for your interest in adopting from <strong>${SHELTER.name}</strong>.
-                We are delighted to let you know that your request to adopt <strong>${petName}</strong> has been <span style="color: #1a5f4a; font-weight: 700;">approved</span>.
+                We are delighted to let you know that your request to interview for <strong>${petName}</strong> has been <span style="color: #1a5f4a; font-weight: 700;">approved</span>.
                 The next and final step is an in-person <strong>adoption interview</strong> at our shelter, where you will meet ${petName} and complete the process.
               </p>
 
