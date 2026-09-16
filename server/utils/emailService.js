@@ -6,11 +6,27 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const SHELTER = {
     name: process.env.SHELTER_NAME || 'Haven Pet Home',
     address: process.env.SHELTER_ADDRESS || 'First Bank Building, Alagbon, Ikoyi, Lagos',
-    phone: process.env.SHELTER_PHONE || '+234 810-969-0608',
+    phone: process.env.SHELTER_PHONE || '+234 810 969 0608',
+    whatsapp: process.env.SHELTER_WHATSAPP || '+234 810 969 0608',
+    whatsappLink: process.env.SHELTER_WHATSAPP_LINK || 'https://wa.me/2348109690608',
     email: process.env.SHELTER_EMAIL || 'info@havenpethome.com',
     visitDays: process.env.SHELTER_VISIT_DAYS || 'Every Saturday',
     visitHours: process.env.SHELTER_VISIT_HOURS || '10:00 AM – 12:00 PM',
 };
+
+const buildWhatsAppContactNote = () => `
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 0 0 24px; background-color: #eafaf1; border: 1px solid #b7e4c7; border-radius: 10px;">
+    <tr>
+      <td style="padding: 18px 20px;">
+        <p style="margin: 0 0 8px; font-size: 15px; font-weight: 700; color: #1a5f4a;">Need a faster reply?</p>
+        <p style="margin: 0; font-size: 15px; color: #444444; line-height: 1.6;">
+          Message us on WhatsApp for an immediate response:
+          <a href="${SHELTER.whatsappLink}" style="color: #128c7e; font-weight: 700; text-decoration: none;">${SHELTER.whatsapp}</a>
+        </p>
+      </td>
+    </tr>
+  </table>
+`;
 
 const buildApprovedAdoptionEmail = ({ name, petName }) => {
     const greeting = name ? `Hello ${name}` : 'Hello';
@@ -348,6 +364,13 @@ const buildShelterVisitCard = ({ title, intro, petName, extraRows = '' }) => `
               <strong style="color: #1a5f4a;">Contact:</strong> ${SHELTER.phone} &middot; ${SHELTER.email}
             </td>
           </tr>
+          <tr>
+            <td style="padding: 10px 0; border-top: 1px solid #d4ede4; color: #555555; font-size: 15px;">
+              <strong style="color: #1a5f4a;">WhatsApp:</strong>
+              <a href="${SHELTER.whatsappLink}" style="color: #128c7e; font-weight: 700; text-decoration: none;">${SHELTER.whatsapp}</a>
+              <span style="color: #777777;"> (for immediate response)</span>
+            </td>
+          </tr>
         </table>
       </td>
     </tr>
@@ -392,8 +415,9 @@ const buildAcceptedBoardingEmail = ({ name, petName, startDate, endDate }) => {
               </td>
             </tr>
           </table>
+          ${buildWhatsAppContactNote()}
           <p style="margin: 0; color: #555555;">
-            If you have any questions before drop-off, please reply to this email or contact us using the details above.
+            If you have any questions before drop-off, please reply to this email, call us, or message us on WhatsApp using the details above.
           </p>
         `
     );
@@ -424,8 +448,9 @@ const buildAcceptedSurrenderEmail = ({ name, petName }) => {
               </td>
             </tr>
           </table>
+          ${buildWhatsAppContactNote()}
           <p style="margin: 0; color: #555555;">
-            Thank you for reaching out to ${SHELTER.name}. If you need directions or have questions before your visit, please contact us using the details above.
+            Thank you for reaching out to ${SHELTER.name}. If you need directions or have questions before your visit, please reply to this email, call us, or message us on WhatsApp using the details above.
           </p>
         `
     );
