@@ -300,6 +300,14 @@ export const sendSurrenderRequestStaffEmail = async (submission) => {
             ${detailRow('Age', pet.age)}
             ${detailRow('Reasons', reasons)}
             ${detailRow('Explanation', reason.explanation)}
+            ${detailRow(
+                'Support',
+                submission.contribution?.choice === 'tip'
+                    ? `Tip of ₦${Number(submission.contribution.amount || 0).toLocaleString()} (ref: ${submission.contribution.paymentReference || 'N/A'})`
+                    : submission.contribution?.choice === 'food'
+                      ? 'Will bring food'
+                      : 'N/A'
+            )}
           </table>
           <p style="margin: 20px 0 0; color: #666;">Please review this request in the admin dashboard under Pet Surrenders.</p>
         `
@@ -307,6 +315,34 @@ export const sendSurrenderRequestStaffEmail = async (submission) => {
 
     return sendStaffEmail({
         subject: `New pet surrender — ${pet.name || 'pet'} from ${surrenderer.fullName || 'a surrenderer'}`,
+        html,
+    });
+};
+
+export const sendVirtualAdoptionStaffEmail = async (sponsorship) => {
+    const petName = sponsorship.pet?.name || 'a dog';
+    const challenges = Array.isArray(sponsorship.challenges) && sponsorship.challenges.length
+        ? sponsorship.challenges.map((item) => `${item.title} (₦${Number(item.amount || 0).toLocaleString()})`).join(', ')
+        : 'None';
+
+    const html = staffEmailLayout(
+        'New virtual adoption',
+        `
+          <p>Someone has virtually adopted a dog for the month.</p>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            ${detailRow('Supporter', sponsorship.supporterName)}
+            ${detailRow('Email', sponsorship.email)}
+            ${detailRow('Dog', petName)}
+            ${detailRow('Monthly feeding', `₦${Number(sponsorship.monthlyFeedPrice || 0).toLocaleString()}`)}
+            ${detailRow('Challenges', challenges)}
+            ${detailRow('Amount paid', `₦${Number(sponsorship.amount || 0).toLocaleString()}`)}
+            ${detailRow('Payment reference', sponsorship.paymentReference)}
+          </table>
+        `
+    );
+
+    return sendStaffEmail({
+        subject: `Virtual adoption — ${petName} from ${sponsorship.supporterName || 'a supporter'}`,
         html,
     });
 };

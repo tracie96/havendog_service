@@ -10,7 +10,8 @@ export const createSurrenderSubmission = async (req, res) => {
             medical,
             behaviour,
             care,
-            declaration
+            declaration,
+            contribution
         } = req.body;
 
         if (
@@ -31,6 +32,19 @@ export const createSurrenderSubmission = async (req, res) => {
             });
         }
 
+        const tipAmount = Number(contribution?.amount);
+        if (contribution?.choice !== 'tip' && contribution?.choice !== 'food') {
+            return res.status(400).json({
+                message: 'Please choose a tip or confirm you will bring food before submitting.'
+            });
+        }
+
+        if (contribution.choice === 'tip' && (tipAmount < 1000 || !contribution.paymentReference)) {
+            return res.status(400).json({
+                message: 'A tip of at least ₦1,000 must be completed before submitting.'
+            });
+        }
+
         const submission = new Surrender({
             surrenderer,
             pet,
@@ -38,7 +52,12 @@ export const createSurrenderSubmission = async (req, res) => {
             medical,
             behaviour,
             care,
-            declaration
+            declaration,
+            contribution: {
+                choice: contribution.choice,
+                amount: contribution.choice === 'tip' ? tipAmount : undefined,
+                paymentReference: contribution.choice === 'tip' ? contribution.paymentReference : undefined
+            }
         });
 
         await submission.save();

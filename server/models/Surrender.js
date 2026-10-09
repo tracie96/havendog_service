@@ -68,6 +68,11 @@ const surrenderSchema = new mongoose.Schema({
     signature: { type: String, required: true },
     date: { type: Date, required: true }
   },
+  contribution: {
+    choice: { type: String, enum: ['tip', 'food'], required: true },
+    amount: { type: Number },
+    paymentReference: { type: String }
+  },
   havenAcceptance: {
     acceptedBy: { type: String },
     position: { type: String },
